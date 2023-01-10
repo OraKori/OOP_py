@@ -91,12 +91,3 @@ class Ulamek:
         return f'{self.__licznik}/{self.__mianownik}'
     def __repr__(self):
         return f'{self.__licznik}/{self.__mianownik}'
-# testy        
-u1 = Ulamek(1, 2)
-u2 = Ulamek(1, 4)
-u3 = Ulamek(1, 4)
-u4 = Ulamek(5, -2)
-print(u1 + u2)
-print(u4 + u1)
-print(u1 == u2)
-print(u2 == u3)
