@@ -1,0 +1,70 @@
+from math import floor
+
+class HashTable:
+    EMPTY_OBJ = object()
+    
+    def __init__(self, m = 2, MLF = 0.75):
+        self.max_length = m
+        self.max_load_factor = MLF
+        self.length = 0
+        self.table = [ self.EMPTY_OBJ for _ in range(self.max_length) ] 
+        
+    def __setitem__(self, key, value):
+        self.length += 1
+        hashed_key = self._hash(key)
+
+        while self.table[hashed_key] is not self.EMPTY_OBJ:
+            if self.table[hashed_key][0] == key:
+                self.length -= 1
+                break
+            hashed_key = (hashed_key + 1) % self.max_length
+            
+        self.table[hashed_key] = (key, value)
+
+        if self.length / float(self.max_length) >= self.max_load_factor:
+            self._resize()
+
+    def __getitem__(self, key):
+        idx = self._find_item(key)
+        return self.table[idx][1]
+    
+    def __delitem__(self, key):
+        idx = self._find_item(key)
+        self.table[idx] = self.EMPTY_OBJ
+    
+    def _find_item(self, key):
+        hashed_key = self._hash(key)
+        
+        if self.table[hashed_key] is self.EMPTY_OBJ:
+            raise KeyError
+            
+        if self.table[hashed_key][0] != key:
+            original_key = hashed_key
+
+            while self.table[hashed_key][0] != key:
+                hashed_key = ( hashed_key + 1 ) % self.max_length
+                
+                if self.table[hashed_key] is self.EMPTY_OBJ:
+                    raise KeyError
+                if hashed_key == original_key:
+                    raise KeyError
+        
+        return hashed_key
+
+    def _hash(self, key):
+        golden = ( 5**(1/2) -1 ) / 2
+        return floor(self.max_length * ( ( key*golden ) % 1 ) )
+  
+    def _resize(self):
+        self.max_length *= 2
+        self.length = 0
+        old_table = self.table
+        self.table = [ self.EMPTY_OBJ for _ in range(self.max_length) ]
+        
+        for tpl in old_table:
+            if tpl is not self.EMPTY_OBJ:
+                self[tpl[0]] = tpl[1]
+            
+    def __str__(self):
+        return str( [ el if el != self.EMPTY_OBJ else None for el in self.table ] )
+            
